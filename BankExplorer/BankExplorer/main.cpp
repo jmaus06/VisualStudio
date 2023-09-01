@@ -3,68 +3,50 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include "bankingHeader.h"
+#include "main.h"
+
 using namespace std;
 using std::ifstream;
 int main() {
-	string token;
-	string x;
-	ifstream fin;
+	
 	int count = 1;
-	bool textonly = false;
-	string dateSub[4000];
-	string priceSub[4000];
-	string savedLine[4000];
-	int curLine = 0;
-	fin.open("statement.csv");
-	std::vector<string> tokens;
-	if (!fin.is_open()) {
-		cout << "File not opened";
-	}
-	string date = "";
-	string dateWanted = "";
-	string lineRead;
-
-	while (date != "exit") {
+	OpenFile();
+	
+	while (date != "exit" && date != "EXIT") {
 		cout << "Welcome to Joel's Bank Explorer. Do not enter leading 0's in dates. Use 1/1/23 format NOT 01/01/23\n\nWhat would you like to search for?\n";
 		cin >> date;
-		cout << "***********Deposits***********\n";
-		while (getline(fin, lineRead)) {
-
-			savedLine[count++] = lineRead;
-			if (lineRead.find(",-")==string::npos) cout << lineRead << endl; //print positive 
-
-
-		}
+		if (firstTime) cout << "***********Deposits***********\n";
+		while (getline(fin, lineRead)) SaveLinesandPrintDeposits(count, lineRead, firstTime);
 		cout << "*******************************\n\n";
 		int loc = 0;
 		int firstLoc = 0;
+		
+		AdjustSpacing(count); //make line more readable
+
 		int digits = date.size();
-		for (int x = 0; x < count; ++x) { //create array of dates
-			dateSub[x] = savedLine[x].substr(0, digits);
-			if (savedLine[x].find(date) != string::npos) {
-				cout << savedLine[x] << endl; //print searched text 
-				textonly = true;
-
-			}
+		for (int x = 0; x < count; ++x) {              //Normal test
+			SaveDates(x, digits);			
+			PrintResults(x, date);	
 		}
-		int totalCount = 0;
+		string dateUpper = MakeUpper(date);
+		for (int x = 0; x < count; ++x) {              //UPPERCASE test			
+			PrintResults(x, dateUpper);
+		}
+		
 		cout << '\n';
-		if (!textonly) { //only do if not searching for text
-			for (int x = 0; x < count; ++x) {
-				if (dateSub[x] == date) {
-					cout << savedLine[x] << endl;
-					++totalCount;
-				}
-
-			}
-			cout << "\n\nThese are the " << totalCount << " transactions on " << date << ".\n";
-
+		
+		if (!textonly) {
+			PrintIfDatesMatch(count);
 		}
 	}
 	textonly = false;
-	cin >> x;
 	fin.close();
-
-
-
 }
+
+
+
+
+
+
+
